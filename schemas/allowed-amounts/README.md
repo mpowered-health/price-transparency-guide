@@ -4,21 +4,16 @@
 | ----- | ---- | ---- | ---------- | -------- |
 | **reporting_entity_name** | Entity Name | String | The legal name of the entity publishing the machine-readable file. | Yes |
 | **reporting_entity_type** | Entity Type | String | The type of entity that is publishing the machine-readable file (a group health plan, health insurance issuer, or a third party with which the plan or issuer has contracted to provide the required information, such as a third-party administrator, a health care claims clearinghouse, or a health insurance issuer that has contracted with a group health plan sponsor). | Yes |
-| **reporting_plans** | Allowed Amount Plans | Array  | An array of [reporting plan object types](#reporting-plans-object) | Yes |
+| **plan_name** | Plan Name | String | The plan name and name of plan sponsor and/or insurance company. | No |
+| **plan_id_type** | Plan Id Type | String | Allowed values: "EIN" and "HIOS" | No |
+| **plan_id** | Plan ID | String | The 10-digit Health Insurance Oversight System (HIOS) identifier, or, if the 10-digit HIOS identifier is not available, the 5-digit HIOS identifier, or if no HIOS identifier is available, the Employer Identification Number (EIN)for    each plan or coverage offered by a plan or issuer. | No |
+| **plan_market_type** | Market Type | String | Allowed values: "group" and "individual" | No |
 | **out_of_network** | Out Of Network | Array | An array of [out-of-network object types](#out-of-network-object) | Yes |
-| **last_updated_on** | Last Updated On | String | The date in which the file was last updated. Date must be in an ISO 8601 format (e.g. YYYY-MM-DD) | Yes |
-| **version** | Version | String | The version of the schema for the produced information | No |
+| **last_updated_on** | Last Updated On | String | The date in which the file was last updated. Date must be in an ISO 8601 format (i.e. YYYY-MM-DD) | Yes |
+| **version** | Version | String | The version of the schema for the produced information | Yes |
 
-#### Reporting Plans Object
-
-Information about the plan that is being reported on for the allowed amounts. Multiple `Reporting Plan Objects` can be included in this array for all of the plans that have identical out-of-network objects in the `out_of_network` array.
-
-| Field | Name | Type | Definition | Required |
-| ----- | ---- | ---- | ---------- | -------- |
-| **plan_name** | Plan Name | String | The plan name and name of plan sponsor and/or insurance company. | Yes |
-| **plan_id_type** | Plan Id Type | String | Allowed values: "EIN" and "HIOS" | Yes |
-| **plan_id** | Plan ID | String | The 14-digit Health Insurance Oversight System (HIOS) identifier, or, if the 14-digit HIOS identifier is not available, the 5-digit HIOS identifier, or if no HIOS identifier is available, the Employer Identification Number (EIN)for    each plan or coverage offered by a plan or issuer. | Yes |
-| **plan_market_type** | Market Type | String | Allowed values: "group" and "individual" | Yes |
+##### Additional Notes Concerning `plan_name`, `plan_id_type`, `plan_id`, `plan_market_type`
+These attributes are not required for files that will be reporting multiple plans per file but ARE REQUIRED for single plans that are being reported that do not wish to create a table-of-content file. For payers/issuers that will be reporting multiple plans per file, these attributes will be required in a table-of-contents file.
 
 #### Out-Of-Network Object
 
@@ -29,7 +24,7 @@ The out-of-network object contains information related to the service that was p
 | **name** | Name | String | The name of each item or service for which the costs are payable, in whole or in part, under the terms of the plan or coverage. | Yes |
 | **billing_code_type** | Billing Code Type | String | Common billing code types. Please see a list of the [currently allowed codes](#additional-notes-concerning-billing_code_type) at the bottom of this document. | Yes |
 | **billing_code** | Billing Code | String | The `billing_code_type` code for the item/service | Yes |
-| **billing_code_type_version** | Billing Code Type Version | String | There might be versions associated with the `billing_code_type`. For example, Medicare's current (as of 5/24/21) MS-DRG version is 37.2 | Yes |
+| **billing_code_type_version** | Billing Code Type Version | String | There might be versions associated with the `billing_code_type`. For example, Medicare's current (as of 5/24/21) MS-DRG version is 37.2 . If there is no version available for the `billing_code_type`, use the current plan's year `YYYY` that is being disclosed.| Yes |
 | **description** | Description | String | Brief description of the item or service. In the case of items and services that are associated with common billing codes (such as the HCPCS codes), the codes’ associated short text description may be provided. In the case of NDCs for prescription drugs, the plain language description must be the proprietary and nonproprietary names assigned to the NDC by the FDA | Yes |
 | **allowed_amounts** | Rates |	Array | An array of [allowed amounts objects](#allowed-amounts-object) | Yes |
 
@@ -61,6 +56,7 @@ The payment object documents the allowed amounts the plan has paid for the servi
 | Field | Name | Type | Definition | Required |
 | ----- | ---- | ---- | ---------- | -------- |
 | **allowed_amount** | Allowed Amount | Number | The allowed amount must be reported as the actual dollar amount the plan or issuer paid to the out-of-network provider for a particular covered item or service, plus the participant’s, beneficiary’s, or enrollee’s share of the cost. See additional notes. | Yes |
+| **billing_code_modifier** | Billing Code Modifier | Array | An array of strings. There are certain billing code types that allow for modifiers (e.g. The CPT coding type allows for modifiers). If a negotiated rate for a billing code type is dependent on a modifier for the reported item or service, then an additional negotiated price object should be included to represent the difference. | No |
 | **providers** | Providers |	Array | An array of [provider objects](#provider-object) | Yes |
 
 ##### Additional Notes

@@ -11,7 +11,19 @@
                 <enum>CPT</enum>
                 <enum>HCPCS</enum>
                 <enum>ICD</enum>
-                <enum>DRG</enum>
+                <enum>MS-DRG</enum>
+                <enum>R-DRG</enum>
+                <enum>S-DRG</enum>
+                <enum>APS-DRG</enum>
+                <enum>AP-DRG</enum>
+                <enum>APR-DRG</enum>
+                <enum>APC</enum>
+                <enum>NDC</enum>
+                <enum>HIPPS</enum>
+                <enum>LOCAL</enum>
+                <enum>EAPG</enum>
+                <enum>CDT</enum>
+                <enum>RC</enum>
             </billing_code_type>
             <billing_code_type_version>
                 <type>string</type>
@@ -75,6 +87,13 @@
             <allowed_amount>
                 <type>number</type>
             </allowed_amount>
+            <billing_code_modifier>
+                <type>array</type>
+                <items>
+                    <type>string</type>
+                </items>
+                <uniqueItems>true</uniqueItems>
+            </billing_code_modifier>
             <providers>
                 <type>array</type>
                 <items>
@@ -156,4 +175,5 @@
 <required>reporting_entity_name</required>
 <required>reporting_entity_type</required>
 <required>last_update_on</required>
+<required>version</required>
 

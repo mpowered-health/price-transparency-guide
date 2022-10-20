@@ -5,7 +5,26 @@
       "type": "object",
       "properties": {
         "name": { "type": "string" },
-        "billing_code_type": { "enum": [ "CPT", "HCPCS", "ICD", "MS-DRG", "R-DRG", "S-DRG", "APS-DRG", "AP-DRG", "APR-DRG", "APC",  "NDC", "HIPPS", "LOCAL", "EAPG", "CDT" ] },
+        "billing_code_type": { 
+          "enum": [
+             "CPT",
+             "HCPCS",
+             "ICD",
+             "MS-DRG",
+             "R-DRG",
+             "S-DRG",
+             "APS-DRG",
+             "AP-DRG",
+             "APR-DRG",
+             "APC",
+             "NDC",
+             "HIPPS",
+             "LOCAL",
+             "EAPG",
+             "CDT",
+             "RC"
+          ]
+        },
         "billing_code_type_version": { "type": "string" },
         "billing_code": { "type": "string" },
         "description": { "type": "string" },
@@ -42,11 +61,11 @@
           "uniqueItems": true
         },
         "billing_class": {
-           "enum": [
-             "professional",
-             "institutional"
-           ]
-         },
+          "enum": [
+            "professional",
+            "institutional"
+          ]
+        },
         "payments": {
           "type": "array",
           "items": { "$ref": "#/definitions/payments" },
@@ -70,6 +89,14 @@
       "type": "object",
       "properties": {
         "allowed_amount": { "type": "number" },
+        "billing_code_modifier": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
         "providers": { 
           "type": "array",
           "items": { "$ref": "#/definitions/providers" },
@@ -91,16 +118,6 @@
         }
       },
       "required": [ "billed_charge", "npi" ]
-    },
-    "reporting_plans": {
-      "type": "object",
-      "properties": {
-        "plan_name": { "type": "string" },
-        "plan_id_type": { "type": "string" },
-        "plan_id": { "type": "string" },
-        "plan_market_type": { "enum": [ "group", "individual" ] }
-      },
-      "required": ["plan_name", "plan_id_type", "plan_id", "plan_market_type"]
     }
   },
 
@@ -108,12 +125,10 @@
   "properties": {
     "reporting_entity_name": { "type": "string" },
     "reporting_entity_type": { "type": "string" },
-    "reporting_plans": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/reporting_plans" },
-      "uniqueItems": true,
-      "default": []
-    },
+    "plan_name": { "type": "string" },
+    "plan_id_type": { "type": "string" },
+    "plan_id": { "type": "string" },
+    "plan_market_type": { "enum": [ "group", "individual" ] },
     "last_updated_on": { "type": "string" },
     "version": { "type": "string" },
     "out_of_network": {
@@ -122,5 +137,11 @@
       "default": []
     }
   },
-  "required": ["reporting_entity_name", "reporting_entity_type", "reporting_plans", "last_updated_on"]
+  "required": ["reporting_entity_name", "reporting_entity_type", "last_updated_on", "version"],
+  "dependentRequired": {
+    "plan_name": ["plan_id_type", "plan_id", "plan_market_type"],
+    "plan_id_type": ["plan_name", "plan_id", "plan_market_type"],
+    "plan_id": ["plan_name","plan_id_type", "plan_market_type"],
+    "plan_market_type": ["plan_name", "plan_id_type", "plan_id"]
+  }
 }

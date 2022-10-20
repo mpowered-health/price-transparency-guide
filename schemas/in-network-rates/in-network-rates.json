@@ -30,7 +30,9 @@
             "HIPPS",
             "LOCAL",
             "EAPG",
-            "CDT"
+            "CDT",
+            "RC",
+            "CSTM-ALL"
           ]
         },
         "billing_code_type_version": {
@@ -78,7 +80,25 @@
       "type": "object",
       "properties": {
         "billing_code_type": {
-          "type": "string"
+          "enum": [
+            "CPT",
+            "HCPCS",
+            "ICD",
+            "MS-DRG",
+            "R-DRG",
+            "S-DRG",
+            "APS-DRG",
+            "AP-DRG",
+            "APR-DRG",
+            "APC",
+            "NDC",
+            "HIPPS",
+            "LOCAL",
+            "EAPG",
+            "CDT",
+            "RC",
+            "CSTM-ALL"
+          ]
         },
         "billing_code_type_version": {
           "type": "string"
@@ -101,7 +121,25 @@
       "type": "object",
       "properties": {
         "billing_code_type": {
-          "type": "string"
+          "enum": [
+            "CPT",
+            "HCPCS",
+            "ICD",
+            "MS-DRG",
+            "R-DRG",
+            "S-DRG",
+            "APS-DRG",
+            "AP-DRG",
+            "APR-DRG",
+            "APC",
+            "NDC",
+            "HIPPS",
+            "LOCAL",
+            "EAPG",
+            "CDT",
+            "RC",
+            "CSTM-ALL"
+          ]
         },
         "billing_code_type_version": {
           "type": "string"
@@ -118,6 +156,32 @@
         "billing_code_type_version",
         "billing_code",
         "description"
+      ]
+    },
+    "provider_references": {
+      "type": "object",
+      "properties": {
+        "provider_group_id": { "type": "number" },
+        "provider_groups": {
+           "type": "array",
+           "items": {
+             "$ref": "#/definitions/providers"
+           },
+           "uniqueItems": true,
+           "default": []
+        },
+        "location": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        }
+      },
+      "anyOf": [
+         { "required": ["location"] },
+         { "required": ["provider_groups"] }
+       ],
+      "required": [
+        "provider_group_id"
       ]
     },
     "providers": {
@@ -171,10 +235,21 @@
           },
           "uniqueItems": true,
           "default": []
+        },
+        "provider_references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/provider_references/properties/provider_group_id"
+          },
+          "uniqueItems": true,
+          "default": []
         }
       },
+      "oneOf": [
+        { "required": ["provider_references"] },
+        { "required": ["provider_groups"] }
+      ],
       "required": [
-        "provider_groups",
         "negotiated_prices"
       ]
     },
@@ -185,7 +260,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum":["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99"]
+            "enum":["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","CSTM-00"]
           },
           "uniqueItems": true
         },
@@ -199,8 +274,18 @@
           "enum": [
             "negotiated",
             "derived",
-            "fee schedule"
+            "fee schedule",
+            "percentage",
+            "per diem"
           ]
+        },
+        "billing_code_modifier": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "default": []
         },
         "negotiated_rate": {
           "type": "number"
@@ -208,6 +293,10 @@
         "expiration_date": {
           "type": "string",
           "description": "This is a date format of YYYY-MM-DD"
+        },
+        "additional_information": {
+          "type": "string",
+          "description": "In situations in which alternative reimbursement arrangements can neither be expressed as a dollar amount nor as a percentage, this open text field can be used to provide information such as, a description of the formula, variables, methodology or other information necessary to understand the arrangement. The open text field may be utilized for reporting only if a plan or issuer cannot disclose its in-network rates as a dollar amount or a percentage."
         }
       },
       "required": [
@@ -226,32 +315,6 @@
           "service_code"
         ]
       }
-    },
-    "reporting_plans": {
-      "type": "object",
-      "properties": {
-        "plan_name": {
-          "type": "string"
-        },
-        "plan_id_type": {
-          "type": "string"
-        },
-        "plan_id": {
-          "type": "string"
-        },
-        "plan_market_type": {
-          "enum": [
-            "group",
-            "individual"
-          ]
-        }
-      },
-      "required": [
-        "plan_name",
-        "plan_id_type",
-        "plan_id",
-        "plan_market_type"
-      ]
     }
   },
   "type": "object",
@@ -262,13 +325,20 @@
     "reporting_entity_type": {
       "type": "string"
     },
-    "reporting_plans": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/reporting_plans"
-      },
-      "uniqueItems": true,
-      "default": []
+    "plan_name": {
+      "type": "string"
+    },
+    "plan_id_type": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "plan_market_type": {
+      "enum": [
+        "group",
+        "individual"
+      ]
     },
     "last_updated_on": {
       "type": "string",
@@ -276,6 +346,13 @@
     },
     "version": {
       "type": "string"
+    },
+    "provider_references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/provider_references"
+      },
+      "default": []
     },
     "in_network": {
       "type": "array",
@@ -288,8 +365,14 @@
   "required": [
     "reporting_entity_name",
     "reporting_entity_type",
-    "reporting_plans",
     "last_updated_on",
-    "in_network"
-  ]
+    "in_network",
+    "version"
+  ],
+  "dependentRequired": {
+    "plan_name": ["plan_id_type", "plan_id", "plan_market_type"],
+    "plan_id_type": ["plan_name", "plan_id", "plan_market_type"],
+    "plan_id": ["plan_name","plan_id_type", "plan_market_type"],
+    "plan_market_type": ["plan_name", "plan_id_type", "plan_id"]
+  }
 }

@@ -31,6 +31,7 @@ Guidance
 Transparency in Coverage rule guidance is released on [CMS'](https://www.cms.gov) website. You can find recently released guidance here:
 * [https://www.cms.gov/CCIIO/Resources/Fact-Sheets-and-FAQs#Affordable_Care_Act](https://www.cms.gov/CCIIO/Resources/Fact-Sheets-and-FAQs#Affordable_Care_Act)
 * [https://www.cms.gov/CCIIO/Resources/Fact-Sheets-and-FAQs/Downloads/FAQs-Part-49.pdf](https://www.cms.gov/CCIIO/Resources/Fact-Sheets-and-FAQs/Downloads/FAQs-Part-49.pdf)
+* [https://www.cms.gov/sites/default/files/2022-04/FAQ-Affordable-Care-Act-Implementation-Part-53.pdf](https://www.cms.gov/sites/default/files/2022-04/FAQ-Affordable-Care-Act-Implementation-Part-53.pdf)
 
 Developer Documentation
 =======================
@@ -69,12 +70,12 @@ This is typically follows the format of `<meta name="robots" content="noindex, n
 Special Data Types
 ------------------
 
-Dates should be strings in [ISO 8601 format](https://en.wikipedia.org/wiki/ISO_8601) (e.g. YYYY-MM-DD).
+Dates should be strings in [ISO 8601 format](https://en.wikipedia.org/wiki/ISO_8601) (i.e. YYYY-MM-DD).
 
-Different Flat Files
---------------------
+Different Machine-Readable Files
+--------------------------------
 
-There are three required flat files associated with Transparency in Coverage:
+There are two required machine-readable files associated with Transparency in Coverage:
 * In-Network Negotiated Rates
 * Out-Of-Network Allowed Amounts
 
@@ -88,12 +89,24 @@ The associated names for those files are:
 * `in-network-rates`
 * `allowed-amounts`
 
+Timing Updates For Machine-Readable Files
+-----------------------------------------
+According to the [TiC Final Rules](https://www.federalregister.gov/d/2020-24591/p-1516) and the schema requirements, plans and issuers are required to update the machine-readable files monthly and populate the attribute `last_updated_on`. The Departments consider “monthly” to refer to reasonably consistent periods of approximately 30 days, but are not specifying a particular day of the month.
+
 File Naming Convention  
 -------------------------
-The following is the required naming standard for each file: `<YYYY-MM-DD>_<payer or issuer name>_<plan name>_<file type name>.<file extension>`
-For payer or issuer's names and plan names that have spaces (i.e. "healthplan 100"), those spaces would be replaced with dashes `-`
+There are scenarios where multiple plans have exactly the same negotiated rates with the same group of providers for the same items and services. This would lead to a large duplication of reporting. Also, there are plans that will be unique in their negotiated rates that would require a separate file.
+
+The producers of the files have the option to group multiple plans together with the same negotiated data (or allowed amounts). If plans are to be grouped together, a `table-of-contents` file will be required to capture all the different plan data along with a URL location on where to download the appropriate files.
+
+Payer/Issuers are still allowed to build both in-network and allowed-amount files for a single plan. The naming conventions will be different for each.
+
+For payer or issuer's names that have spaces, those spaces would be replaced with dashes `-`
 
 Only alphanumeric characters are allowed in the file name. No special characters such as `'` are allowed. Special characters are either to be removed completely or replaced with `-`.
+
+#### Single Plan Files
+The following is the required naming standard for each file: `<YYYY-MM-DD>_<payer or issuer name>_<plan name>_<file type name>.<file extension>`
 
 For example, the following would be the required naming for CMS building a JSON file:
 * `2020-01-05_cms_medicare_in-network-rates.json`
@@ -102,6 +115,14 @@ For example, the following would be the required naming for CMS building a JSON 
 An example of a plan named `healthcare 100` with an issuer's name `issuer abc` producing a JSON file, the following would be the naming output:
 * `2020-01-05_issuer-abc_healthcare-100_in-network-rates.json`
 * `2020-01-05_issuer-abc_healthcare-100_allowed-amounts.json`
+
+#### Multiple Plans Per File
+If multiple plans are to be included in a single file, a `table-of-contents` file will be required. The naming standard will be applied to the `table-of-contents` file and both the `in-network` and `allowed-amounts` files will not have any naming standards.
+
+The following is the required naming standard for the `table-of-contents` file: `<YYYY-MM-DD>_<payer or issuer name>_index.<file extension>`
+
+For example, the following would be the required naming for CMS building a JSON file that includes Medicare and Medicaid plans:
+* `2020-01-05_cms_index.json`
 
 Schemas
 =======
@@ -132,3 +153,8 @@ MINOR version when attributes/values are introduced or removed in a backwards co
 PATCH version when backwards compatible bug fixes are introduced.
 
 The major version will be finalized to 1.0.0 for the schema to adhere to the July 2022 implementation date. Versioning of the schema can be tracked in the VERSION.md file.
+
+Schema Validator Tool
+=====================
+
+CMS developed a [downloadable schema validator tool](https://github.com/CMSgov/price-transparency-guide-validator) that plans and developers can use to assess whether their machine readable files are compliant with the Transparency in Coverage JSON schema. The validator tool and instructions can be accessed here. The tool can be used to validate in-network and allowed amount files, as well as provider references and table of contents files. Note that the tool tests for attributes required under version 1.0 of the JSON schema and for syntax errors, but does not test the accuracy of the data in the schema. It is designed to run on local computers and can be used to validate files of any size (there is no file size limit). At this point in time, the validator tool can only be used to validate JSON files.
